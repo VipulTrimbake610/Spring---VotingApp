@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voting Page</title>
+    <style>
+        body {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+        }
+
+        div {
+            border: 2px solid;
+            padding: 20px;
+            width: 400px;
+            font-size: 20px;
+
+        }
+
+        label {
+            border: 1px solid black;
+            padding: 5px 10px;
+        }
+
+        button {
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div>
+        <input type="radio" name="vote" id="rdb1">
+        <label for="">Candidate 1</label><br><br>
+
+        <input type="radio" name="vote" id="rdb2">
+        <label for="">Candidate 2</label><br><br>
+
+        <input type="radio" name="vote" id="rdb3">
+        <label for="">Candidate 3</label><br><br>
+
+        <input type="radio" name="vote" id="rdb4">
+        <label for="">Candidate 4</label><br><br>
+
+        <button type="button" onClick="handleVote()">Vote</button>
+    </div>
+
+    <script>
+
+
+        if (!sessionStorage.getItem('token')) {
+            location.href = "index.html";
+        }
+
+        function handleVote() {
+            let inputs = document.getElementsByTagName("input");
+            if(!inputs[0].checked && !inputs[1].checked && !inputs[2].checked && !inputs[3].checked){
+                alert("Please select at least one candidate!");
+            }else{
+                let candidateName;
+                if (inputs[0].checked) {
+                    candidateName = "Candidate 1";
+                }
+                if (inputs[1].checked) {
+                    candidateName = "Candidate 2";
+                }
+                if (inputs[2].checked) {
+                    candidateName = "Candidate 3";
+                }
+                if (inputs[3].checked) {
+                    candidateName = "Candidate 4";
+                }
+    
+                let userObj = {
+                    "id":sessionStorage.getItem("token"),
+                    "vote":candidateName
+                }
+    
+                fetch("http://localhost:8080/vote", {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userObj)
+                })
+                    .then(response => response.text())
+                    .then(data => {
+                        sessionStorage.removeItem("token");
+                        alert(data);
+                        location.reload();
+
+                        
+                    })
+            }
+
+        }
+    </script>
+</body>
+
+</html>
