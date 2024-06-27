@@ -36,46 +36,52 @@
             <label for="exampleInputPassword1" class="form-label">Phone Number</label>
             <input type="tel" class="form-control" id="phone">
         </div>
-        <button type="button" class="btn btn-primary"  id="register" onClick="registerFun()">Register</button>
+        <button type="button" class="btn btn-primary" id="register" onClick="registerFun()">Register</button>
         <button type="button" class="btn btn-primary" onClick="loginFun()">Login</button>
     </form>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
-        
-        <script>
-            
-            function registerFun(){
-                let username = document.getElementById("username");
-                let password = document.getElementById("password");
-                let email = document.getElementById("email");
-                let phone = document.getElementById("phone");
-                
-                let userObj = {
-                    "username":username.value,
-                    "password":password.value,
-                    "emailId":email.value,
-                    "phoneNo":phone.value
-                }
 
-                if(username.value == null || password.value == null || email.value == null || phone.value == null){
-                    alert("Please fill all credentials!");
-                }else{
-                    fetch('http://localhost:8080/register',{
-                        method: 'POST',
-                        headers: {
+    <script>
+
+        function registerFun() {
+            let username = document.getElementById("username");
+            let password = document.getElementById("password");
+            let email = document.getElementById("email");
+            let phone = document.getElementById("phone");
+
+            let userObj = {
+                "username": username.value,
+                "password": password.value,
+                "emailId": email.value,
+                "phoneNo": phone.value
+            }
+
+            if (username.value == null || password.value == null || email.value == null || phone.value == null) {
+                alert("Please fill all credentials!");
+            } else {
+                fetch('http://localhost:8080/register', {
+                    method: 'POST',
+                    headers: {
                         'Content-Type': 'application/json'
-                         },
-                         body: JSON.stringify(userObj)
+                    },
+                    body: JSON.stringify(userObj)
+                })
+                    .then(response => response.text())
+                    .then(data => {
+                        sessionStorage.setItem("token", data);
+                        if (sessionStorage.getItem("token")) {
+                            location.href = "votingPage.html";
+                        }
+                        else {
+                            alert("Username already exist!");
+                        }
                     })
-                    .then(response=> response.text())
-                    .then(data=> {sessionStorage.setItem("token",data); 
-                                location.href = "votingPage.html";})
-                }
+            }
+        }
 
-        }   
-
-        function loginFun(){
+        function loginFun() {
             location.href = "index.html";
         }
     </script>

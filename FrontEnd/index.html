@@ -70,7 +70,10 @@
                                 fetch('http://localhost:8080/getUser?id='+data)
                                 .then(response=>response.text())
                                 .then(data=>{
-                                    if(data.vote == null){
+                                    console.log(data);
+                                    data1 = JSON.parse(data);
+                                    console.log(data1.vote);
+                                    if(data1.vote){
                                         alert("You already voted!");
                                     }else{
                                         location.href = "votingPage.html";

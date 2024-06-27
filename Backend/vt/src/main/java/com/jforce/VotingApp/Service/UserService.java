@@ -25,8 +25,12 @@ public class UserService {
         return null;
     }
     public String register(User user){
-        user = userRespository.save(user);
-        return user.getUUID();
+        User user1 = userRespository.findUserByUsername(user.getUsername());
+        if(user1==null){
+            user = userRespository.save(user);
+            return user.getUUID();
+        }
+        return null;
     }
 
     public String vote(VoteRequest voteRequest){
