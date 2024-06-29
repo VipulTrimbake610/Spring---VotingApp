@@ -4,6 +4,5 @@ import lombok.Data;
 
 @Data
 public class VoteRequest {
-    String id;
     String vote;
 }

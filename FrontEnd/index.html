@@ -19,7 +19,7 @@
 </head>
 
 <body>
-    <form>
+    <form method="post" action="/login">
         <div class="mb-3">
             <label for="exampleInputEmail1" class="form-label">Username</label>
             <input type="text" class="form-control" id="username" aria-describedby="emailHelp">
@@ -37,54 +37,38 @@
         crossorigin="anonymous"></script>
     <script>
         
-        function loginFun() {
-            let username = document.getElementById("username");
-                let password = document.getElementById("password");
-                
-                let userObj = {
-                    "username":username.value,
-                    "password":password.value
-                }
+        async function loginFun(){
+            let userObj = {
+                "username":document.getElementById("username").value,
+                "password":document.getElementById("password").value
+            }
 
-                if(username.value==null || password.value == null){
-                    alert("Please fill login credentials");
-                }else{
-                    if(username.value === "Admin" && password.value==='admin'){
-                        // Admin Login
-                        sessionStorage.setItem('token',"admin");
-                        location.href = "AdminVotingHomePage.html";
-                    }else{
-                        // User Login
-                        fetch('http://localhost:8080/login',{
+
+            let response = await fetch('http://localhost:8080/auth/login',{
                             method: 'POST',
                             headers: {
                             'Content-Type': 'application/json'
                              },
                              body: JSON.stringify(userObj)
-                        })
-                        .then(response=> response.text())
-                        .then(data=>
-                        {
-                            sessionStorage.setItem("token",data);
-                            if(sessionStorage.getItem("token") ){
-                                fetch('http://localhost:8080/getUser?id='+data)
-                                .then(response=>response.text())
-                                .then(data=>{
-                                    console.log(data);
-                                    data1 = JSON.parse(data);
-                                    console.log(data1.vote);
-                                    if(data1.vote){
-                                        alert("You already voted!");
-                                    }else{
-                                        location.href = "votingPage.html";
-                                    }
-                                })
-                            }else{
-                                alert("User doesn't exist!");
-                            }
-                            })
-                    }
+                        });
+            let data = await response.json();
+            console.log(data);
+            console.log(data.statusCode);
+            console.log(data.token);
+            console.log(data.role);
+            if(data.statusCode == 200){
+                localStorage.setItem("token",data.token);
+
+                if(data.role === "ADMIN"){
+                    location.href = "AdminVotingHomePage.html";
                 }
+                if(data.role === "USER"){
+                    location.href = "./votingPage.html";
+                }
+                
+            }else{
+                alert(data.error);
+            }
         }
 
         function registerFun() {

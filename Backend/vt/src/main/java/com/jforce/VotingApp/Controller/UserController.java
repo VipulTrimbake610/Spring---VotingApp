@@ -1,45 +1,34 @@
 package com.jforce.VotingApp.Controller;
-
-import com.jforce.VotingApp.Models.User;
-import com.jforce.VotingApp.Requests.LoginRequest;
+import com.jforce.VotingApp.DTO.ReqRes;
 import com.jforce.VotingApp.Requests.VoteRequest;
-import com.jforce.VotingApp.Response.voteResponse;
 import com.jforce.VotingApp.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://127.0.0.1:5500") // Specify the allowed origin
-public class UserController {
+//@CrossOrigin(origins = "http://127.0.0.1:5500") // Specify the allowed origin
+@RequestMapping("/user")
+public class UserController{
 
     @Autowired
     UserService userService;
 
-    @PostMapping("/login")
-    public String login(@RequestBody LoginRequest loginRequest){
-        return userService.login(loginRequest);
-    }
-
-    @PostMapping("/register")
-    public String register(@RequestBody User user){
-        return userService.register(user);
-    }
-
     @PutMapping("/vote")
-    public String vote(@RequestBody VoteRequest voteRequest){
-        return userService.vote(voteRequest);
+    public ResponseEntity setVote(@RequestBody VoteRequest voteRequest){
+        ReqRes reqRes = new ReqRes();
+        try{
+            String response = userService.setVote(voteRequest);
+            reqRes.setStatusCode(200);
+            reqRes.setMessage(response);
+            return new ResponseEntity<>(reqRes,HttpStatus.OK);
+        }catch (Exception e){
+            reqRes.setStatusCode(400);
+            reqRes.setError(e.getMessage());
+            return new ResponseEntity<>(reqRes,HttpStatus.BAD_REQUEST);
+            }
+        }
     }
-
-    @GetMapping("/getUser")
-    public User getUser(@RequestParam String id){
-        return userService.getUser(id);
-    }
-
-    @GetMapping("/getVotes")
-    public List<Object[]> getVotes(){
-        return userService.getVotes();
-    }
-}

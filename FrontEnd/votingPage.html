@@ -59,16 +59,14 @@
     <script>
 
 
-        if (!sessionStorage.getItem('token')) {
+        if (!localStorage.getItem('token')) {
             location.href = "index.html";
         }
 
-        function handleVote() {
+        async function handleVote() {
+            let token = localStorage.getItem("token");
             let inputs = document.getElementsByTagName("input");
-            if(!inputs[0].checked && !inputs[1].checked && !inputs[2].checked && !inputs[3].checked){
-                alert("Please select at least one candidate!");
-            }else{
-                let candidateName;
+            let candidateName;
                 if (inputs[0].checked) {
                     candidateName = "Candidate 1";
                 }
@@ -83,27 +81,26 @@
                 }
     
                 let userObj = {
-                    "id":sessionStorage.getItem("token"),
                     "vote":candidateName
                 }
     
-                fetch("http://localhost:8080/vote", {
+                let response = await fetch("http://localhost:8080/user/vote", {
                     method: 'PUT',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify(userObj)
                 })
-                    .then(response => response.text())
-                    .then(data => {
-                        sessionStorage.removeItem("token");
-                        alert(data);
-                        location.reload();
-
-                        
-                    })
-            }
-
+                
+                let data = await response.json();
+                if(data.statusCode == 200){
+                    alert(data.message);
+                }else{
+                    alert(data.error);
+                }
+                localStorage.removeItem("token");
+                location.reload();
         }
     </script>
 </body>

@@ -1,50 +1,39 @@
 package com.jforce.VotingApp.Service;
 
+import com.jforce.VotingApp.Config.JWTAuthFilter;
+import com.jforce.VotingApp.Config.JWTUtils;
+import com.jforce.VotingApp.DTO.ReqRes;
 import com.jforce.VotingApp.Models.User;
 import com.jforce.VotingApp.Repository.UserRespository;
-
-import com.jforce.VotingApp.Requests.LoginRequest;
 import com.jforce.VotingApp.Requests.VoteRequest;
-import com.jforce.VotingApp.Response.voteResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
-
 import java.util.List;
 
 @Service
 public class UserService {
     @Autowired
-    UserRespository userRespository;
+    private UserRespository userRespository;
 
-    public String login(LoginRequest loginRequest){
-        User user1 = userRespository.findUserByUsername(loginRequest.getUsername());
-        if(user1!=null){
-            return user1.getUUID();
-        }
-        return null;
-    }
-    public String register(User user){
-        User user1 = userRespository.findUserByUsername(user.getUsername());
-        if(user1==null){
-            user = userRespository.save(user);
-            return user.getUUID();
-        }
-        return null;
-    }
+    @Autowired
+    private JWTUtils jwtUtils;
 
-    public String vote(VoteRequest voteRequest){
-        User user = userRespository.findById(voteRequest.getId()).get();
+    public String setVote(VoteRequest voteRequest)throws Exception{
+        String username = jwtUtils.extractUsername(jwtUtils.jToken);
+
+        User user = userRespository.findByUsername(username).get();
+        if(user.getVote() != null && !user.getVote().equals("")){
+            throw new Exception("User Already Voted!!!");
+        }
+
         user.setVote(voteRequest.getVote());
-        userRespository.save(user);
-        return "user voted successfully!";
-    }
+        user = userRespository.save(user);
+        if(user == null){
+            throw new Exception("Unable to save vote in the DB!");
+        }
 
-    public User getUser(String id){
-        return userRespository.findById(id).get();
-    }
-
-    public List<Object[]> getVotes(){
-        return userRespository.getVotes();
+        return "user voted successfully with username : "+user.getUsername();
     }
 }

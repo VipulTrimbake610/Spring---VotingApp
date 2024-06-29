@@ -6,10 +6,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRespository extends JpaRepository<User, String> {
-    User findUserByUsername(String username);
+
+    Optional<User> findByUsername(String username);
 
     @Query(value = "select vote,count(vote) from users group by vote",nativeQuery = true)
     public List<Object[]> getVotes();
